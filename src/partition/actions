@@ -1,0 +1,5 @@
+
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
+pub struct Partition {
+
+}
