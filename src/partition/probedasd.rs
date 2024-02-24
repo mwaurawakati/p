@@ -14,17 +14,10 @@ struct DasdInfo {
     dasd_type: Option<String>,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let dasds = probe()?;
-    for (devname, info) in dasds {
-        println!("{}: {:?}", devname, info);
-    }
-    Ok(())
-}
 
 fn probe() -> Result<HashMap<String, DasdInfo>, Box<dyn std::error::Error>> {
     let mut dasds = HashMap::new();
-    let mut context = Enumerator::new()?;
+    let context = Enumerator::new()?;
     for device in context.scan_devices()? {
         if device.property_value("DEVTYPE") == Some(std::ffi::OsStr::new("disk")) {
             if let Some(devname) = device.devnode() {
@@ -39,11 +32,7 @@ fn probe() -> Result<HashMap<String, DasdInfo>, Box<dyn std::error::Error>> {
 
 fn get_dasd_info(device: &udev::Device) -> Option<DasdInfo> {
     let name = device.devnode()?.to_str()?.to_owned();
-    let device_id = device
-        .property_value("ID_PATH")
-        .unwrap_or_default()
-        .to_string_lossy()
-        .replace("ccw-", "");
+    let device_id = device.property_value("ID_PATH").unwrap_or_default().to_string_lossy().replace("ccw-", "");
     let dasdview_output = dasdview(&name)?;
     let disk_layout = disk_format(&dasdview_output);
     let blocksize = find_val_int("blocksize", &dasdview_output);
@@ -73,9 +62,9 @@ fn dasdview(devname: &str) -> Option<String> {
 
 fn find_val(pattern: &str, content: &str) -> Option<String> {
     let regex = Regex::new(&format!(r"{}:\s+hex\s+\w+\s+dec\s+(?P<value>\d+)", pattern)).ok()?;
-    regex
-        .captures(content)
-        .and_then(|cap| cap.name("value").map(|value| value.as_str().to_string()))
+    regex.captures(content).and_then(|cap| {
+        cap.name("value").map(|value| value.as_str().to_string())
+    })
 }
 
 fn find_val_int(pattern: &str, content: &str) -> Option<u32> {
@@ -85,13 +74,11 @@ fn find_val_int(pattern: &str, content: &str) -> Option<u32> {
 fn disk_format(content: &str) -> Option<String> {
     let regex = Regex::new(r"^format\s+:\s+.+\s+(?P<value>\w+\s\w+)$").ok()?;
     regex.captures(content).and_then(|cap| {
-        cap.name("value")
-            .map(|value| match value.as_str().to_lowercase().as_str() {
-                "cdl formatted" => Some("cdl".to_string()),
-                "ldl formatted" => Some("ldl".to_string()),
-                "not formatted" => Some("not-formatted".to_string()),
-                _ => None,
-            })
-            .flatten()
+        cap.name("value").map(|value| match value.as_str().to_lowercase().as_str() {
+            "cdl formatted" => Some("cdl".to_string()),
+            "ldl formatted" => Some("ldl".to_string()),
+            "not formatted" => Some("not-formatted".to_string()),
+            _ => None,
+        }).flatten()
     })
 }
