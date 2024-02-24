@@ -1,7 +1,7 @@
 mod partition;
-use tracing::{info, error};
+//use std::error::Error;
+use tracing::{error, info};
 use tracing_subscriber;
-use std::error::Error;
 
 fn main() {
     tracing_subscriber::fmt::init();
@@ -10,8 +10,8 @@ fn main() {
         Ok(m) => {
             info!(m);
         }
-        Err(e)=>{
-            error!( "{}", e.description());
+        Err(e) => {
+            error!("{}", e.to_string());
         }
     }
 }
