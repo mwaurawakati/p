@@ -1,9 +1,9 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::io::{self, Read};
-
-pub fn do_umount(mountpoint: &Path, recursive: bool, private: bool) -> io::Result<bool> {
+//use std::io::{self, Read};
+use std::io::BufRead;
+pub fn do_umount(mountpoint: &Path, recursive: bool, private: bool) -> std::io::Result<bool> {
     let mp = fs::canonicalize(mountpoint)?;
     let mut ret = false;
 
@@ -38,9 +38,9 @@ pub fn do_umount(mountpoint: &Path, recursive: bool, private: bool) -> io::Resul
     Ok(ret)
 }
 
-pub fn is_mounted(target: &Path, src: Option<&Path>, opts: Option<&str>) -> io::Result<bool> {
-    let mounts_file = File::open("/proc/mounts")?;
-    let reader = BufReader::new(mounts_file);
+pub fn is_mounted(target: &Path, src: Option<&Path>, opts: Option<&str>) -> std::io::Result<bool> {
+    let mounts_file = std::fs::File::open("/proc/mounts")?;
+    let reader = std::io::BufReader::new(mounts_file);
 
     let target = target.canonicalize()?;
 

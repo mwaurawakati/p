@@ -6,10 +6,10 @@ use std::str;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct OsProber {
-    subpath: String,
-    long: String,
-    label: String,
-    type_: String,
+    subpath: Option<String>,
+    long: Option<String>,
+    label: Option<String>,
+    type_: Option<String>,
     version: Option<String>,
 }
 #[allow(dead_code)]
@@ -32,10 +32,10 @@ pub fn probe_os() -> Vec<OsProber> {
             let version = long_parts.get(1).map(|&s| s.to_string());
 
             OsProber {
-                subpath: parts.get(0).unwrap_or(&"").to_string(),
-                long,
-                label: parts.get(2).unwrap_or(&"").to_string(),
-                type_: parts.get(3).unwrap_or(&"").to_string(),
+                subpath: Some(parts.get(0).unwrap_or(&"").to_string()),
+                long:Some(long),
+                label: Some(parts.get(2).unwrap_or(&"").to_string()),
+                type_: Some(parts.get(3).unwrap_or(&"").to_string()),
                 version,
             }
         })

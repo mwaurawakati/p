@@ -4,7 +4,7 @@ use std::path::Path;
 use regex::Regex;
 use std::collections::HashMap;
 
-pun fn sane_block_devices() -> Vec<String> {
+pub fn sane_block_devices() -> Vec<String> {
     let mut devices = Vec::new();
     let paths = fs::read_dir("/sys/block").unwrap();
     

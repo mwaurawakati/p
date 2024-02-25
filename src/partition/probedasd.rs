@@ -17,7 +17,7 @@ struct DasdInfo {
 
 fn probe() -> Result<HashMap<String, DasdInfo>, Box<dyn std::error::Error>> {
     let mut dasds = HashMap::new();
-    let context = Enumerator::new()?;
+    let mut context = Enumerator::new()?;
     for device in context.scan_devices()? {
         if device.property_value("DEVTYPE") == Some(std::ffi::OsStr::new("disk")) {
             if let Some(devname) = device.devnode() {

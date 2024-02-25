@@ -6,7 +6,10 @@ use std::{
     os::unix::fs::FileTypeExt, // This trait provides the is_block_device method
     path::{Path, PathBuf},
 };
+//use serde::{Serialize, Deserialize};
+use serde_json;
 use tracing::{debug, error, info};
+
 #[allow(dead_code)]
 fn path_exists(path_str: &str) -> bool {
     Path::new(path_str).exists()
@@ -366,4 +369,13 @@ fn construct_real_path(kname: &str) -> String {
         Ok(real_path) => real_path.to_str().unwrap_or("").to_string(),
         Err(_) => "".to_string(), // Provide a default value in case of an error
     }
+}
+
+pub fn unmarshal_json<T: for<'de> serde::Deserialize<'de>>(data: &str, v: &mut Option<T>) -> Result<(), serde_json::Error> {
+    *v = Some(serde_json::from_str(data)?);
+    Ok(())
+}
+
+pub fn marshal_json<T: serde::Serialize>(v: &T) -> Result<String, serde_json::Error> {
+    serde_json::to_string(v)
 }
